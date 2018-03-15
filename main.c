@@ -16,13 +16,6 @@ typedef struct _image {
     unsigned int h;
 } Image;
 
-
-int max(int a, int b) {
-    if (a > b)
-        return a;
-    return b;
-}
-
 int pixel_igual(Pixel p1, Pixel p2) {
     if (p1.r == p2.r &&
         p1.g == p2.g &&
