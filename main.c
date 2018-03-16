@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+unsigned int counter;
+unsigned int counter_two;
+
 typedef struct _pixel {
     unsigned short int red;
     unsigned short int green;
@@ -7,35 +10,31 @@ typedef struct _pixel {
 } Pixel;
 
 typedef struct _image {
-    // [width][height][rgb]
-    // 0 -> r
-    // 1 -> g
-    // 2 -> b
     unsigned short int pixel[512][512][3];
     unsigned int widht;
     unsigned int height;
 } Image;
+int media_pixel(unsigned short int pixel[512][512][3]){
+  int media = (pixel[counter][counter_two][0] +
+              pixel[counter][counter_two][1] +
+              pixel[counter][counter_two][2])/3;
+  return media;
+}
+void copy(unsigned short int pixel[512][512][3],int media){
+  pixel[counter][counter_two][0] = media;
+  pixel[counter][counter_two][1] = media;
+  pixel[counter][counter_two][2] = media;
+}
+Image escala_de_cinza(Image image) {
 
-Image escala_de_cinza(Image img) {
-    /*for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.widht; ++j) {
-            print("%u", img.pixel[i][j][0] + img.pixel[i][j][1] + img.pixel[i][j][2]);
-        }
-    }*/
-
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.widht; ++j) {
-            int media = img.pixel[i][j][0] +
-                        img.pixel[i][j][1] +
-                        img.pixel[i][j][2];
-            media /= 3;
-            img.pixel[i][j][0] = media;
-            img.pixel[i][j][1] = media;
-            img.pixel[i][j][2] = media;
+    for (counter = 0; counter < image.height; ++counter) {
+        for (counter_two = 0; counter_two < image.widht; ++counter_two) {
+            int media = media_pixel(image.pixel);
+            copy(image.pixel,media);
         }
     }
 
-    return img;
+    return image;
 }
 
 void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w) {
