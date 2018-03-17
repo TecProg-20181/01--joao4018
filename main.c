@@ -20,32 +20,31 @@ int calculate_average(unsigned short int pixel[512][512][3]){
               pixel[counter][counter_two][2])/3;
   return media;
 }
-void copy_data(unsigned short int pixel[512][512][3],int media){
-  pixel[counter][counter_two][0] = media;
-  pixel[counter][counter_two][1] = media;
-  pixel[counter][counter_two][2] = media;
+void copy_data(unsigned short int pixel[512][512][3],int *media){
+  pixel[counter][counter_two][0] = *media;
+  pixel[counter][counter_two][1] = *media;
+  pixel[counter][counter_two][2] = *media;
 }
 Image change_color_to_gray(Image image) {
-
+    Image aux;
     for (counter = 0; counter < image.height; ++counter) {
         for (counter_two = 0; counter_two < image.widht; ++counter_two) {
             int media = calculate_average(image.pixel);
-            copy_data(image.pixel, media);
+            copy_data(image.pixel, &media);
         }
     }
 
     return image;
 }
-
-void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w) {
-    for (unsigned int i = 0; i < h; ++i) {
-        for (unsigned int j = 0; j < w; ++j) {
+void blur(unsigned int height, unsigned short int pixel[512][512][3], int tamanho, unsigned int wight) {
+    for (unsigned int i = 0; i < height; ++i) {
+        for (unsigned int j = 0; j < wight; ++j) {
             Pixel media = {0, 0, 0};
 
-            int menor_h = (h - 1 > i + T/2) ? i + T/2 : h - 1;
-            int min_w = (w - 1 > j + T/2) ? j + T/2 : w - 1;
-            for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_h; ++x) {
-                for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_w; ++y) {
+            int menor_height = (height - 1 > i + tamanho/2) ? i + tamanho/2 : height - 1;
+            int min_wight = (wight - 1 > j + tamanho/2) ? j + tamanho/2 : wight - 1;
+            for(int x = (0 > i - tamanho/2 ? 0 : i - tamanho/2); x <= menor_height; ++x) {
+                for(int y = (0 > j - tamanho/2 ? 0 : j - tamanho/2); y <= min_wight; ++y) {
                     media.red += pixel[x][y][0];
                     media.green += pixel[x][y][1];
                     media.blue += pixel[x][y][2];
@@ -53,9 +52,9 @@ void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned
             }
 
             // printf("%u", media.r)
-            media.red /= T * T;
-            media.green /= T * T;
-            media.blue /= T * T;
+            media.red /= tamanho * tamanho;
+            media.green /= tamanho * tamanho;
+            media.blue /= tamanho * tamanho;
 
             pixel[i][j][0] = media.red;
             pixel[i][j][1] = media.green;
