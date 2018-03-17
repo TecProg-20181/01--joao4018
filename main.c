@@ -14,23 +14,23 @@ typedef struct _image {
     unsigned int widht;
     unsigned int height;
 } Image;
-int media_pixel(unsigned short int pixel[512][512][3]){
+int calculate_average(unsigned short int pixel[512][512][3]){
   int media = (pixel[counter][counter_two][0] +
               pixel[counter][counter_two][1] +
               pixel[counter][counter_two][2])/3;
   return media;
 }
-void copy(unsigned short int pixel[512][512][3],int media){
+void copy_data(unsigned short int pixel[512][512][3],int media){
   pixel[counter][counter_two][0] = media;
   pixel[counter][counter_two][1] = media;
   pixel[counter][counter_two][2] = media;
 }
-Image escala_de_cinza(Image image) {
+Image change_color_to_gray(Image image) {
 
     for (counter = 0; counter < image.height; ++counter) {
         for (counter_two = 0; counter_two < image.widht; ++counter_two) {
-            int media = media_pixel(image.pixel);
-            copy(image.pixel,media);
+            int media = calculate_average(image.pixel);
+            copy_data(image.pixel, media);
         }
     }
 
@@ -140,7 +140,7 @@ int main() {
 
         switch(opcao) {
             case 1: { // Escala de Cinza
-                img = escala_de_cinza(img);
+                img = change_color_to_gray(img);
                 break;
             }
             case 2: { // Filtro Sepia
