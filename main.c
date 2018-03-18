@@ -108,27 +108,30 @@ Image cortar_imagem(Image img, int x, int y, int w, int h) {
     return cortada;
 }
 
+Image read_data()
+{
+  int max_color;
+  char p3[4];
+  Image img;
+
+  scanf("%s",p3);
+  scanf("%u %u %d", &img.widht, &img.height, &max_color);
+  for (unsigned int i = 0; i < img.height; ++i) {
+    for (unsigned int j = 0; j < img.widht; ++j) {
+      scanf("%hu %hu %hu", &img.pixel[i][j][0],
+      &img.pixel[i][j][1],
+      &img.pixel[i][j][2]);
+    }
+  }
+return img;
+}
 
 int main() {
     Image img;
 
+
     // read type of image
-    char p3[4];
-    scanf("%s", p3);
-
-    // read width height and color of image
-    int max_color;
-    scanf("%u %u %d", &img.widht, &img.height, &max_color);
-
-    // read all pixels of image
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.widht; ++j) {
-            scanf("%hu %hu %hu", &img.pixel[i][j][0],
-                                 &img.pixel[i][j][1],
-                                 &img.pixel[i][j][2]);
-
-        }
-    }
+    img = read_data();
 
     int n_opcoes;
     scanf("%d", &n_opcoes);
