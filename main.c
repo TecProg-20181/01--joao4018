@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-unsigned int counter;
-unsigned int counter_two;
+unsigned int counter = 0;
+unsigned int counter_two = 0;
 
 typedef struct _pixel {
     unsigned short int red;
@@ -20,13 +20,14 @@ int calculate_average(unsigned short int pixel[512][512][3]){
               pixel[counter][counter_two][2])/3;
   return media;
 }
+
 void copy_data(unsigned short int pixel[512][512][3],int *media){
   pixel[counter][counter_two][0] = *media;
   pixel[counter][counter_two][1] = *media;
   pixel[counter][counter_two][2] = *media;
 }
+
 Image change_color_to_gray(Image image) {
-    Image aux;
     for (counter = 0; counter < image.height; ++counter) {
         for (counter_two = 0; counter_two < image.widht; ++counter_two) {
             int media = calculate_average(image.pixel);
@@ -143,6 +144,29 @@ void print_image(Image image){
           printf("\n");
       }
 }
+Image filter_serpia(Image image){
+  for (counter = 0; counter < image.height; ++counter) {
+    for (counter_two = 0; counter_two < image.widht; ++counter_two) {
+      unsigned short int pixel[3];
+      pixel[0] = image.pixel[counter][counter_two][0];
+      pixel[1] = image.pixel[counter][counter_two][1];
+      pixel[2] = image.pixel[counter][counter_two][2];
+
+      int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
+      int menor_r = (255 >  p) ? p : 255;
+      image.pixel[counter][counter_two][0] = menor_r;
+
+      p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
+      menor_r = (255 >  p) ? p : 255;
+      image.pixel[counter][counter_two][1] = menor_r;
+
+      p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
+      menor_r = (255 >  p) ? p : 255;
+      image.pixel[counter][counter_two][2] = menor_r;
+    }
+  }
+  return image;
+}
 void options(Image image){
   int n_opcoes;
   scanf("%d", &n_opcoes);
@@ -157,27 +181,7 @@ void options(Image image){
               break;
           }
           case 2: { // Filtro Sepia
-              for (unsigned int x = 0; x < image.height; ++x) {
-                  for (unsigned int j = 0; j < image.widht; ++j) {
-                      unsigned short int pixel[3];
-                      pixel[0] = image.pixel[x][j][0];
-                      pixel[1] = image.pixel[x][j][1];
-                      pixel[2] = image.pixel[x][j][2];
-
-                      int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
-                      int menor_r = (255 >  p) ? p : 255;
-                      image.pixel[x][j][0] = menor_r;
-
-                      p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
-                      menor_r = (255 >  p) ? p : 255;
-                      image.pixel[x][j][1] = menor_r;
-
-                      p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
-                      menor_r = (255 >  p) ? p : 255;
-                      image.pixel[x][j][2] = menor_r;
-                  }
-              }
-
+               image = filter_serpia(image);
               break;
           }
           case 3: { // Blur
