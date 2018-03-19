@@ -144,6 +144,38 @@ void print_image(Image image){
           printf("\n");
       }
 }
+Image mirror(Image image){
+  int horizontal = 0;
+  scanf("%d", &horizontal);
+
+  int w = image.widht, h = image.height;
+
+  if (horizontal == 1) w /= 2;
+  else h /= 2;
+
+  for (int i2 = 0; i2 < h; ++i2) {
+    for (int j = 0; j < w; ++j) {
+      int x = i2, y = j;
+
+      if (horizontal == 1) y = image.widht - 1 - j;
+      else x = image.height - 1 - i2;
+
+      Pixel aux1;
+      aux1.red = image.pixel[i2][j][0];
+      aux1.green = image.pixel[i2][j][1];
+      aux1.blue = image.pixel[i2][j][2];
+
+      image.pixel[i2][j][0] = image.pixel[x][y][0];
+      image.pixel[i2][j][1] = image.pixel[x][y][1];
+      image.pixel[i2][j][2] = image.pixel[x][y][2];
+
+      image.pixel[x][y][0] = aux1.red;
+      image.pixel[x][y][1] = aux1.green;
+      image.pixel[x][y][2] = aux1.blue;
+    }
+  }
+  return image;
+}
 Image filter_serpia(Image image){
   for (counter = 0; counter < image.height; ++counter) {
     for (counter_two = 0; counter_two < image.widht; ++counter_two) {
@@ -167,6 +199,7 @@ Image filter_serpia(Image image){
   }
   return image;
 }
+
 void options(Image image){
   int n_opcoes;
   scanf("%d", &n_opcoes);
@@ -200,35 +233,7 @@ void options(Image image){
               break;
           }
           case 5: { // Espelhamento
-              int horizontal = 0;
-              scanf("%d", &horizontal);
-
-              int w = image.widht, h = image.height;
-
-              if (horizontal == 1) w /= 2;
-              else h /= 2;
-
-              for (int i2 = 0; i2 < h; ++i2) {
-                  for (int j = 0; j < w; ++j) {
-                      int x = i2, y = j;
-
-                      if (horizontal == 1) y = image.widht - 1 - j;
-                      else x = image.height - 1 - i2;
-
-                      Pixel aux1;
-                      aux1.red = image.pixel[i2][j][0];
-                      aux1.green = image.pixel[i2][j][1];
-                      aux1.blue = image.pixel[i2][j][2];
-
-                      image.pixel[i2][j][0] = image.pixel[x][y][0];
-                      image.pixel[i2][j][1] = image.pixel[x][y][1];
-                      image.pixel[i2][j][2] = image.pixel[x][y][2];
-
-                      image.pixel[x][y][0] = aux1.red;
-                      image.pixel[x][y][1] = aux1.green;
-                      image.pixel[x][y][2] = aux1.blue;
-                  }
-              }
+            image = mirror(image);
               break;
           }
           case 6: { // Inversao de Cores
