@@ -14,41 +14,45 @@ typedef struct _image {
     unsigned int widht;
     unsigned int height;
 } Image;
-int calculate_average(unsigned short int pixel[512][512][3]){
-  int media = (pixel[counter][counter_two][0] +
-              pixel[counter][counter_two][1] +
-              pixel[counter][counter_two][2])/3;
+
+int calculate_average(Image *image){
+  int media = ((*image).pixel[counter][counter_two][0] +
+              (*image).pixel[counter][counter_two][1] +
+              (*image).pixel[counter][counter_two][2])/3;
   return media;
 }
 
-void copy_data(unsigned short int pixel[512][512][3],int *media){
-  pixel[counter][counter_two][0] = *media;
-  pixel[counter][counter_two][1] = *media;
-  pixel[counter][counter_two][2] = *media;
+void copy_data(Image *image,int *media){
+  (*image).pixel[counter][counter_two][0] = *media;
+  (*image).pixel[counter][counter_two][1] = *media;
+  (*image).pixel[counter][counter_two][2] = *media;
 }
 
 Image change_color_to_gray(Image image) {
     for (counter = 0; counter < image.height; ++counter) {
         for (counter_two = 0; counter_two < image.widht; ++counter_two) {
-            int media = calculate_average(image.pixel);
-            copy_data(image.pixel, &media);
+            int media = calculate_average(&image);
+            copy_data(&image, &media);
         }
     }
 
     return image;
 }
-void blur(unsigned int height, unsigned short int pixel[512][512][3], int tamanho, unsigned int wight) {
-    for (unsigned int i = 0; i < height; ++i) {
-        for (unsigned int j = 0; j < wight; ++j) {
+
+void blur(Image *image) {
+  int tamanho = 0;
+  scanf("%d", &tamanho);
+    for (counter = 0; counter < (*image).height; ++counter) {
+        for (unsigned int counter_two = 0; counter_two < (*image).widht; ++counter_two) {
             Pixel media = {0, 0, 0};
 
-            int menor_height = (height - 1 > i + tamanho/2) ? i + tamanho/2 : height - 1;
-            int min_wight = (wight - 1 > j + tamanho/2) ? j + tamanho/2 : wight - 1;
-            for(int x = (0 > i - tamanho/2 ? 0 : i - tamanho/2); x <= menor_height; ++x) {
-                for(int y = (0 > j - tamanho/2 ? 0 : j - tamanho/2); y <= min_wight; ++y) {
-                    media.red += pixel[x][y][0];
-                    media.green += pixel[x][y][1];
-                    media.blue += pixel[x][y][2];
+            int menor_height = ((*image).height - 1 > counter + tamanho/2) ? counter + tamanho/2 : (*image).height - 1;
+            int min_widht = ((*image).widht - 1 > counter_two + tamanho/2) ? counter_two + tamanho/2 : (*image).widht - 1;
+            for(int x = (0 > counter - tamanho/2 ? 0 : counter - tamanho/2); x <= menor_height; ++x) {
+                for(int y = (0 > counter_two - tamanho/2 ? 0 : counter_two - tamanho/2); y <= min_widht; ++y) {
+                    media.red += (*image).pixel[x][y][0];
+                    media.green += (*image).pixel[x][y][1];
+                    media.blue += (*image).pixel[x][y][2];
                 }
             }
 
@@ -57,9 +61,9 @@ void blur(unsigned int height, unsigned short int pixel[512][512][3], int tamanh
             media.green /= tamanho * tamanho;
             media.blue /= tamanho * tamanho;
 
-            pixel[i][j][0] = media.red;
-            pixel[i][j][1] = media.green;
-            pixel[i][j][2] = media.blue;
+            (*image).pixel[counter][counter_two][0] = media.red;
+            (*image).pixel[counter][counter_two][1] = media.green;
+            (*image).pixel[counter][counter_two][2] = media.blue;
         }
     }
 }
@@ -220,9 +224,8 @@ int main() {
           break;
         }
         case 3: { // Blur
-          int tamanho = 0;
-          scanf("%d", &tamanho);
-          blur(image.height, image.pixel, tamanho, image.widht);
+
+          blur(&image);
           break;
         }
         case 4: { // Rotacao
@@ -255,6 +258,6 @@ int main() {
 
     }
     print_image(image);
-  
+
     return 0;
 }
