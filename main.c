@@ -200,63 +200,61 @@ Image filter_serpia(Image image){
   return image;
 }
 
-void options(Image image){
-  int n_opcoes;
-  scanf("%d", &n_opcoes);
+int main() {
+    Image image;
+    image = read_image();
+    int n_opcoes;
+    scanf("%d", &n_opcoes);
 
-  for(int i = 0; i < n_opcoes; ++i) {
+    for(int i = 0; i < n_opcoes; ++i) {
       int opcao;
       scanf("%d", &opcao);
 
       switch(opcao) {
-          case 1: { // Escala de Cinza
-              image = change_color_to_gray(image);
-              break;
+        case 1: { // Escala de Cinza
+          image = change_color_to_gray(image);
+          break;
+        }
+        case 2: { // Filtro Sepia
+          image = filter_serpia(image);
+          break;
+        }
+        case 3: { // Blur
+          int tamanho = 0;
+          scanf("%d", &tamanho);
+          blur(image.height, image.pixel, tamanho, image.widht);
+          break;
+        }
+        case 4: { // Rotacao
+          int quantas_vezes = 0;
+          scanf("%d", &quantas_vezes);
+          quantas_vezes %= 4;
+          for (int j = 0; j < quantas_vezes; ++j) {
+            image = rotacionar90direita(image);
           }
-          case 2: { // Filtro Sepia
-               image = filter_serpia(image);
-              break;
-          }
-          case 3: { // Blur
-              int tamanho = 0;
-              scanf("%d", &tamanho);
-              blur(image.height, image.pixel, tamanho, image.widht);
-              break;
-          }
-          case 4: { // Rotacao
-              int quantas_vezes = 0;
-              scanf("%d", &quantas_vezes);
-              quantas_vezes %= 4;
-              for (int j = 0; j < quantas_vezes; ++j) {
-                  image = rotacionar90direita(image);
-              }
-              break;
-          }
-          case 5: { // Espelhamento
-            image = mirror(image);
-              break;
-          }
-          case 6: { // Inversao de Cores
-              inverter_cores(image.pixel, image.widht, image.height);
-              break;
-          }
-          case 7: { // Cortar Imagem
-              int x, y;
-              scanf("%d %d", &x, &y);
-              int w, h;
-              scanf("%d %d", &w, &h);
+          break;
+        }
+        case 5: { // Espelhamento
+          image = mirror(image);
+          break;
+        }
+        case 6: { // Inversao de Cores
+          inverter_cores(image.pixel, image.widht, image.height);
+          break;
+        }
+        case 7: { // Cortar Imagem
+          int x, y;
+          scanf("%d %d", &x, &y);
+          int w, h;
+          scanf("%d %d", &w, &h);
 
-              image = cortar_imagem(image, x, y, w, h);
-              break;
-          }
+          image = cortar_imagem(image, x, y, w, h);
+          break;
+        }
       }
 
-  }
-  print_image(image);
-}
-int main() {
-    Image image;
-    image = read_image();
-    options(image);
+    }
+    print_image(image);
+  
     return 0;
 }
