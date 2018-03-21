@@ -28,6 +28,8 @@ void copy_data(Image *image,int *media){
   (*image).pixel[counter][counter_two][2] = *media;
 }
 
+
+
 Image change_color_to_gray(Image image) {
     for (counter = 0; counter < image.height; ++counter) {
         for (counter_two = 0; counter_two < image.widht; ++counter_two) {
@@ -39,31 +41,36 @@ Image change_color_to_gray(Image image) {
     return image;
 }
 
+void change_pixel_color(Image *image, Pixel *media, int *tamanho){
+  int menor_height = ((*image).height - 1 > counter + *tamanho/2) ? counter + *tamanho/2 : (*image).height - 1;
+  int min_widht = ((*image).widht - 1 > counter_two + *tamanho/2) ? counter_two + *tamanho/2 : (*image).widht - 1;
+  for(int x = (0 > counter - *tamanho/2 ? 0 : counter - *tamanho/2); x <= menor_height; ++x) {
+    for(int y = (0 > counter_two - *tamanho/2 ? 0 : counter_two - *tamanho/2); y <= min_widht; ++y) {
+      (*media).red += (*image).pixel[x][y][0];
+      (*media).green += (*image).pixel[x][y][1];
+      (*media).blue += (*image).pixel[x][y][2];
+    }
+  }
+}
+
+void change_pixel_image_color(Image *image, Pixel *media, int *tamanho){
+  (*media).red /= *tamanho * *tamanho;
+  (*media).green /= *tamanho * *tamanho;
+  (*media).blue /= *tamanho * *tamanho;
+
+  (*image).pixel[counter][counter_two][0] = (*media).red;
+  (*image).pixel[counter][counter_two][1] = (*media).green;
+  (*image).pixel[counter][counter_two][2] = (*media).blue;
+}
+
 void blur(Image *image) {
   int tamanho = 0;
   scanf("%d", &tamanho);
     for (counter = 0; counter < (*image).height; ++counter) {
-        for (unsigned int counter_two = 0; counter_two < (*image).widht; ++counter_two) {
+        for (counter_two = 0; counter_two < (*image).widht; ++counter_two) {
             Pixel media = {0, 0, 0};
-
-            int menor_height = ((*image).height - 1 > counter + tamanho/2) ? counter + tamanho/2 : (*image).height - 1;
-            int min_widht = ((*image).widht - 1 > counter_two + tamanho/2) ? counter_two + tamanho/2 : (*image).widht - 1;
-            for(int x = (0 > counter - tamanho/2 ? 0 : counter - tamanho/2); x <= menor_height; ++x) {
-                for(int y = (0 > counter_two - tamanho/2 ? 0 : counter_two - tamanho/2); y <= min_widht; ++y) {
-                    media.red += (*image).pixel[x][y][0];
-                    media.green += (*image).pixel[x][y][1];
-                    media.blue += (*image).pixel[x][y][2];
-                }
-            }
-
-            // printf("%u", media.r)
-            media.red /= tamanho * tamanho;
-            media.green /= tamanho * tamanho;
-            media.blue /= tamanho * tamanho;
-
-            (*image).pixel[counter][counter_two][0] = media.red;
-            (*image).pixel[counter][counter_two][1] = media.green;
-            (*image).pixel[counter][counter_two][2] = media.blue;
+            change_pixel_color(*(&image), &media, &tamanho);
+            change_pixel_image_color(*(&image), &media, &tamanho);
         }
     }
 }
