@@ -10,7 +10,6 @@ typedef struct _pixel {
 } Pixel;
 
 typedef struct _image {
-
   Pixel pixel[512][512];
   unsigned int widht;
   unsigned int height;
@@ -29,7 +28,7 @@ Image change_color_to_gray(Image image);
 Image cortar_imagem(Image img);
 Image rotacionar90direita(Image image);
 Image mirror(Image image);
-Image filter_serpia(Image image);
+Image filter_sepia(Image image);
 
 int main(){
   Image image;
@@ -48,7 +47,7 @@ int main(){
         break;
        }
       case 2: { // Filtro Sepia
-        image = filter_serpia(image);
+        image = filter_sepia(image);
         break;
       }
       case 3: { // Blur
@@ -84,6 +83,14 @@ int max(int a, int b) {
   return a;
 }
 
+Pixel copy_pixel(Pixel pixel,Pixel image){
+  pixel.red = image.red;
+  pixel.green = image.green;
+  pixel.blue = image.blue;
+
+  return pixel;
+}
+
 int calculate_average(Image *image){
   int media = ((*image).pixel[counter][counter_two].red +
   (*image).pixel[counter][counter_two].green +
@@ -97,8 +104,6 @@ void copy_data(Image *image,int *media){
   (*image).pixel[counter][counter_two].blue = *media;
 }
 
-
-
 Image change_color_to_gray(Image image) {
   for (counter = 0; counter < image.height; ++counter) {
     for (counter_two = 0; counter_two < image.widht; ++counter_two) {
@@ -108,12 +113,15 @@ Image change_color_to_gray(Image image) {
   }
     return image;
 }
-//
+
 void change_pixel_color(Image *image, Pixel *media, int *tamanho){
+
   int menor_height = max(((*image).height - 1), (counter + *tamanho/2));
   int min_widht = max(((*image).widht - 1), (counter_two + *tamanho/2));
-  for(int x = (0 > counter - *tamanho/2 ? 0 : counter - *tamanho/2); x <= menor_height; ++x) {
-    for(int y = (0 > counter_two - *tamanho/2 ? 0 : counter_two - *tamanho/2); y <= min_widht; ++y) {
+
+  int x = max((counter - *tamanho/2), 0);
+  for(int x = (0 > counter - *tamanho/2 ? 0 : counter - *tamanho/2); x <= menor_height; ++x)  {
+    for(int y = (0 > counter_two - *tamanho/2 ? 0 : counter_two - *tamanho/2) ; y <= min_widht; ++y) {
       (*media).red += (*image).pixel[x][y].red;
       (*media).green += (*image).pixel[x][y].green;
       (*media).blue += (*image).pixel[x][y].blue;
@@ -126,9 +134,8 @@ void change_pixel_image_color(Image *image, Pixel *media, int *tamanho){
   (*media).green /= *tamanho * *tamanho;
   (*media).blue /= *tamanho * *tamanho;
 
-  (*image).pixel[counter][counter_two].red = (*media).red;
-  (*image).pixel[counter][counter_two].green = (*media).green;
-  (*image).pixel[counter][counter_two].blue = (*media).blue;
+  (*image).pixel[counter][counter_two] = copy_pixel((*image).pixel[counter][counter_two],*media);
+
 }
 
 Image blur(Image *image) {
@@ -156,9 +163,7 @@ Image rotacionar90direita(Image image) {
 
     for (unsigned int i = 0, y = 0; i < rotacionada.height; ++i, ++y) {
       for (int j = rotacionada.widht - 1, x = 0; j >= 0; --j, ++x) {
-        rotacionada.pixel[i][j].red = image.pixel[x][y].red;
-        rotacionada.pixel[i][j].green  = image.pixel[x][y].green;
-        rotacionada.pixel[i][j].blue = image.pixel[x][y].blue;
+        rotacionada.pixel[i][j] = copy_pixel(rotacionada.pixel[i][j], image.pixel[x][y]);
       }
     }
   }
@@ -189,9 +194,7 @@ Image cortar_imagem(Image img) {
 
   for(int i = 0; i < h; ++i) {
     for(int j = 0; j < w; ++j) {
-      cortada.pixel[i][j].red = img.pixel[i + y][j + x].red;
-      cortada.pixel[i][j].green = img.pixel[i + y][j + x].green;
-      cortada.pixel[i][j].blue = img.pixel[i + y][j + x].blue;
+      cortada.pixel[i][j] = copy_pixel(cortada.pixel[i][j], img.pixel[i + y][j + x]);
     }
   }
 
@@ -225,7 +228,6 @@ void print_image(Image image){
   for (counter = 0; counter < image.height; ++counter) {
     for (counter_two = 0; counter_two < image.widht; ++counter_two) {
       printf("%hu %hu %hu ", image.pixel[counter][counter_two].red,
-
         image.pixel[counter][counter_two].green,
         image.pixel[counter][counter_two].blue);
 
@@ -251,39 +253,31 @@ Image mirror(Image image){
       else x = image.height - 1 - i2;
 
       Pixel aux1;
-      aux1.red = image.pixel[i2][j].red;
-      aux1.green = image.pixel[i2][j].green;
-      aux1.blue = image.pixel[i2][j].blue;
+      aux1 = copy_pixel(aux1,image.pixel[i2][j]);
+      image.pixel[i2][j] = copy_pixel(image.pixel[i2][j],image.pixel[x][y]);
+      image.pixel[x][y] = copy_pixel(image.pixel[x][y],aux1);;
 
-      image.pixel[i2][j].red = image.pixel[x][y].red;
-      image.pixel[i2][j].green = image.pixel[x][y].green;
-      image.pixel[i2][j].blue = image.pixel[x][y].blue;
-
-      image.pixel[x][y].red = aux1.red;
-      image.pixel[x][y].green = aux1.green;
-      image.pixel[x][y].blue = aux1.blue;
     }
   }
   return image;
 }
 
-Image filter_serpia(Image image){
+Image filter_sepia(Image image){
   for (counter = 0; counter < image.height; ++counter) {
     for (counter_two = 0; counter_two < image.widht; ++counter_two) {
-      unsigned short int pixel[3];
-      pixel[0] = image.pixel[counter][counter_two].red;
-      pixel[1] = image.pixel[counter][counter_two].green;
-      pixel[2] = image.pixel[counter][counter_two].blue;
+      Image pixel;
 
-      int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
+      pixel.pixel[counter][counter_two] = copy_pixel(pixel.pixel[counter][counter_two],image.pixel[counter][counter_two]);
+
+      int p =  pixel.pixel[counter][counter_two].red * .393 + pixel.pixel[counter][counter_two].green * .769 + pixel.pixel[counter][counter_two].blue * .189;
       int menor_r = (255 >  p) ? p : 255;
       image.pixel[counter][counter_two].red = menor_r;
 
-      p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
+      p =  pixel.pixel[counter][counter_two].red * .349 + pixel.pixel[counter][counter_two].green * .686 + pixel.pixel[counter][counter_two].blue * .168;
       menor_r = (255 >  p) ? p : 255;
       image.pixel[counter][counter_two].green = menor_r;
 
-      p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
+      p =  pixel.pixel[counter][counter_two].red * .272 + pixel.pixel[counter][counter_two].green * .534 + pixel.pixel[counter][counter_two].blue * .131;
       menor_r = (255 >  p) ? p : 255;
       image.pixel[counter][counter_two].blue = menor_r;
     }
