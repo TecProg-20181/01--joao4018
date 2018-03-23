@@ -20,13 +20,14 @@ void change_pixel_color(Image *image, Pixel *media, int *tamanho);
 void change_pixel_image_color(Image *image, Pixel *media, int *tamanho);
 int max(int a, int b);
 int calculate_average(Image *image);
+Pixel copy_pixel(Pixel pixel,Pixel image);
 void copy_data(Image *image,int *media);
 void print_image(Image image);
-Image inverter_cores(Image image);
+Image invert_colors(Image image);
 Image blur(Image *image);
 Image change_color_to_gray(Image image);
-Image cortar_imagem(Image img);
-Image rotacionar90direita(Image image);
+Image cut_image(Image img);
+Image rotate(Image image);
 Image mirror(Image image);
 Image filter_sepia(Image image);
 
@@ -55,7 +56,7 @@ int main(){
         break;
       }
       case 4: { // Rotacao
-        image = rotacionar90direita(image);
+        image = rotate(image);
         break;
       }
       case 5: { // Espelhamento
@@ -63,11 +64,11 @@ int main(){
         break;
       }
       case 6: { // Inversao de Cores
-        image = inverter_cores(image);
+        image = invert_colors(image);
         break;
       }
       case 7: { // Cortar Imagem
-        image = cortar_imagem(image);
+        image = cut_image(image);
         break;
         }
       }
@@ -119,7 +120,6 @@ void change_pixel_color(Image *image, Pixel *media, int *tamanho){
   int menor_height = max(((*image).height - 1), (counter + *tamanho/2));
   int min_widht = max(((*image).widht - 1), (counter_two + *tamanho/2));
 
-  int x = max((counter - *tamanho/2), 0);
   for(int x = (0 > counter - *tamanho/2 ? 0 : counter - *tamanho/2); x <= menor_height; ++x)  {
     for(int y = (0 > counter_two - *tamanho/2 ? 0 : counter_two - *tamanho/2) ; y <= min_widht; ++y) {
       (*media).red += (*image).pixel[x][y].red;
@@ -151,7 +151,7 @@ Image blur(Image *image) {
   return *image;
 }
 
-Image rotacionar90direita(Image image) {
+Image rotate(Image image) {
   int quantas_vezes = 0;
   scanf("%d", &quantas_vezes);
   quantas_vezes %= 4;
@@ -170,7 +170,7 @@ Image rotacionar90direita(Image image) {
   return rotacionada;
 }
 
-Image inverter_cores(Image image) {
+Image invert_colors(Image image) {
   for (counter = 0; counter < image.height; ++counter) {
     for (counter_two = 0; counter_two < image.widht; ++counter_two) {
       image.pixel[counter][counter_two].red = 255 - image.pixel[counter][counter_two].red;
@@ -181,7 +181,7 @@ Image inverter_cores(Image image) {
   return image;
 }
 
-Image cortar_imagem(Image img) {
+Image cut_image(Image img) {
   Image cortada;
 
   int x, y;
@@ -192,9 +192,9 @@ Image cortar_imagem(Image img) {
   cortada.widht = w;
   cortada.height = h;
 
-  for(int i = 0; i < h; ++i) {
-    for(int j = 0; j < w; ++j) {
-      cortada.pixel[i][j] = copy_pixel(cortada.pixel[i][j], img.pixel[i + y][j + x]);
+  for(counter = 0; counter < h; ++counter) {
+    for(counter_two = 0; counter_two < w; ++counter_two) {
+      cortada.pixel[counter][counter_two] = copy_pixel(cortada.pixel[counter][counter_two], img.pixel[counter + y][counter_two + x]);
     }
   }
 
