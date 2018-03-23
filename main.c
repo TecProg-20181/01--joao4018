@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-unsigned int counter = 0;
-unsigned int counter_two = 0;
+unsigned int count = 0;
+unsigned int count_two = 0;
 
 typedef struct _pixel {
   unsigned short int red;
@@ -19,12 +19,13 @@ Image read_image();
 void change_pixel_color(Image *image, Pixel *media, int *tamanho);
 void change_pixel_image_color(Image *image, Pixel *media, int *tamanho);
 int max(int a, int b);
+int min(int a, int b);
 int calculate_average(Image *image);
 Pixel copy_pixel(Pixel pixel,Pixel image);
 void copy_data(Image *image,int *media);
 void print_image(Image image);
 Image invert_colors(Image image);
-Image blur(Image *image);
+void blur(Image *image);
 Image change_color_to_gray(Image image);
 Image cut_image(Image img);
 Image rotate(Image image);
@@ -52,7 +53,7 @@ int main(){
         break;
       }
       case 3: { // Blur
-        image = blur(&image);
+        blur(&image);
         break;
       }
       case 4: { // Rotacao
@@ -78,10 +79,15 @@ int main(){
     return 0;
 }
 
-int max(int a, int b) {
+int min(int a, int b) {
   if (a > b)
     return b;
   return a;
+}
+int max(int a, int b) {
+  if (a > b)
+    return a;
+  return b;
 }
 
 Pixel copy_pixel(Pixel pixel,Pixel image){
@@ -93,21 +99,21 @@ Pixel copy_pixel(Pixel pixel,Pixel image){
 }
 
 int calculate_average(Image *image){
-  int media = ((*image).pixel[counter][counter_two].red +
-  (*image).pixel[counter][counter_two].green +
-  (*image).pixel[counter][counter_two].blue)/3;
+  int media = ((*image).pixel[count][count_two].red +
+  (*image).pixel[count][count_two].green +
+  (*image).pixel[count][count_two].blue)/3;
 return media;
 }
 
 void copy_data(Image *image,int *media){
-  (*image).pixel[counter][counter_two].red = *media;
-  (*image).pixel[counter][counter_two].green = *media;
-  (*image).pixel[counter][counter_two].blue = *media;
+  (*image).pixel[count][count_two].red = *media;
+  (*image).pixel[count][count_two].green = *media;
+  (*image).pixel[count][count_two].blue = *media;
 }
 
 Image change_color_to_gray(Image image) {
-  for (counter = 0; counter < image.height; ++counter) {
-    for (counter_two = 0; counter_two < image.widht; ++counter_two) {
+  for (count = 0; count < image.height; ++count) {
+    for (count_two = 0; count_two < image.widht; ++count_two) {
       int media = calculate_average(&image);
       copy_data(&image, &media);
     }
@@ -117,11 +123,11 @@ Image change_color_to_gray(Image image) {
 
 void change_pixel_color(Image *image, Pixel *media, int *tamanho){
 
-  int menor_height = max(((*image).height - 1), (counter + *tamanho/2));
-  int min_widht = max(((*image).widht - 1), (counter_two + *tamanho/2));
+  int menor_height = min(((*image).height - 1), (count + *tamanho/2));
+  int min_widht = min(((*image).widht - 1), (count_two + *tamanho/2));
 
-  for(int x = (0 > counter - *tamanho/2 ? 0 : counter - *tamanho/2); x <= menor_height; ++x)  {
-    for(int y = (0 > counter_two - *tamanho/2 ? 0 : counter_two - *tamanho/2) ; y <= min_widht; ++y) {
+  for(int x = (max(0, (count - *tamanho/2))) ; x <= menor_height; ++x)  {
+    for(int y = (max(0, (count_two - *tamanho/2))) ; y <= min_widht; ++y) {
       (*media).red += (*image).pixel[x][y].red;
       (*media).green += (*image).pixel[x][y].green;
       (*media).blue += (*image).pixel[x][y].blue;
@@ -134,27 +140,30 @@ void change_pixel_image_color(Image *image, Pixel *media, int *tamanho){
   (*media).green /= *tamanho * *tamanho;
   (*media).blue /= *tamanho * *tamanho;
 
-  (*image).pixel[counter][counter_two] = copy_pixel((*image).pixel[counter][counter_two],*media);
-
+  (*image).pixel[count][count_two] = copy_pixel((*image).pixel[count][count_two],*media);
 }
 
-Image blur(Image *image) {
+void blur(Image *image) {
   int tamanho = 0;
   scanf("%d", &tamanho);
-  for (counter = 0; counter < (*image).height; ++counter) {
-    for (counter_two = 0; counter_two < (*image).widht; ++counter_two) {
+  for (count = 0; count < (*image).height; ++count) {
+    for (count_two = 0; count_two < (*image).widht; ++count_two) {
       Pixel media = {0, 0, 0};
       change_pixel_color(*(&image), &media, &tamanho);
       change_pixel_image_color(*(&image), &media, &tamanho);
     }
   }
-  return *image;
+}
+
+int how_many_rotations(){
+  scanf("%d", &count);
+  count %= 4;
+  return count;
 }
 
 Image rotate(Image image) {
-  int quantas_vezes = 0;
-  scanf("%d", &quantas_vezes);
-  quantas_vezes %= 4;
+  int quantas_vezes;
+  quantas_vezes = how_many_rotations();
   Image rotacionada;
   for (int j = 0; j < quantas_vezes; ++j) {
 
@@ -171,8 +180,8 @@ Image rotate(Image image) {
 }
 
 Image invert_colors(Image image) {
-  for (counter = 0; counter < image.height; ++counter) {
-    for (counter_two = 0; counter_two < image.widht; ++counter_two) {
+  for (unsigned counter = 0; counter < image.height; ++counter) {
+    for (unsigned counter_two = 0; counter_two < image.widht; ++counter_two) {
       image.pixel[counter][counter_two].red = 255 - image.pixel[counter][counter_two].red;
       image.pixel[counter][counter_two].green = 255 - image.pixel[counter][counter_two].green;
       image.pixel[counter][counter_two].blue = 255 - image.pixel[counter][counter_two].blue;
@@ -192,8 +201,8 @@ Image cut_image(Image img) {
   cortada.widht = w;
   cortada.height = h;
 
-  for(counter = 0; counter < h; ++counter) {
-    for(counter_two = 0; counter_two < w; ++counter_two) {
+  for(unsigned counter = 0; counter < h; ++counter) {
+    for(unsigned counter_two = 0; counter_two < w; ++counter_two) {
       cortada.pixel[counter][counter_two] = copy_pixel(cortada.pixel[counter][counter_two], img.pixel[counter + y][counter_two + x]);
     }
   }
@@ -210,8 +219,8 @@ Image read_image() {
   scanf("%u %u", &image.widht, &image.height);
   scanf("%d",&max_color);
 
-  for (counter = 0; counter < image.height; ++counter) {
-    for (counter_two = 0; counter_two < image.widht; ++counter_two) {
+  for (unsigned int counter = 0; counter < image.height; ++counter) {
+    for (unsigned int counter_two = 0; counter_two < image.widht; ++counter_two) {
 
       scanf("%hu", &image.pixel[counter][counter_two].red);
       scanf("%hu",&image.pixel[counter][counter_two].green);
@@ -225,8 +234,8 @@ void print_image(Image image){
   printf("P3\n");
   printf("%u %u\n255\n", image.widht, image.height);
 
-  for (counter = 0; counter < image.height; ++counter) {
-    for (counter_two = 0; counter_two < image.widht; ++counter_two) {
+  for (unsigned int counter = 0; counter < image.height; ++counter) {
+    for (unsigned int counter_two = 0; counter_two < image.widht; ++counter_two) {
       printf("%hu %hu %hu ", image.pixel[counter][counter_two].red,
         image.pixel[counter][counter_two].green,
         image.pixel[counter][counter_two].blue);
@@ -263,8 +272,8 @@ Image mirror(Image image){
 }
 
 Image filter_sepia(Image image){
-  for (counter = 0; counter < image.height; ++counter) {
-    for (counter_two = 0; counter_two < image.widht; ++counter_two) {
+  for (unsigned int counter = 0; counter < image.height; ++counter) {
+    for (unsigned int counter_two = 0; counter_two < image.widht; ++counter_two) {
       Image pixel;
 
       pixel.pixel[counter][counter_two] = copy_pixel(pixel.pixel[counter][counter_two],image.pixel[counter][counter_two]);
